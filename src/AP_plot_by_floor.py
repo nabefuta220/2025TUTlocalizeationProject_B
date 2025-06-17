@@ -50,7 +50,7 @@ segment_C_df = filtered_df[filtered_df["Location index P"] <= 17]
 segment_C2_df = filtered_df[(filtered_df["Location index P"] >= 17) & (
     filtered_df["Location index P"] <= 45)]
 segment_C3_df = filtered_df[filtered_df["Location index P"] >= 45]
-AP_list = df["AP_ID"].unique()  # AP_nameのユニークな値を表示
+# Removed unused variable AP_list
 
 # 階数、棟の名前で形を変える
 # 描画スタイルの設定
