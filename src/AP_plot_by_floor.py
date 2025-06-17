@@ -3,7 +3,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def plot_df(ax, df, title):
+def plot_df( df, title):
+
+    fig, ax = plt.subplots(figsize=(16, 10))
+    ax=sns.set(style="whitegrid")
+
     ax = sns.scatterplot(
         data=df,
         x="Location index P",
@@ -24,11 +28,13 @@ def plot_df(ax, df, title):
 
 # Excelファイルの読み込み
 excel_path = "dataset/dataset/measured_RSSI.xlsx"
-df = pd.read_excel(excel_path)
-
+df_3F = pd.read_excel(excel_path, sheet_name="tutwifi_C3F")
+df_3F["Location Floor"] = 3  # 階数を追加
+df_4F = pd.read_excel(excel_path, sheet_name="tutwifi_C4F")
+df_4F["Location Floor"] = 4  # 階数を追加
+df= pd.concat([df_3F, df_4F])  # 3Fと4Fのデータを結合
 
 df["AP_ID"] = (df["Center Freq(MHz)"]//1000).astype(str)+"GHz_"+df["AP_name"]
-
 df["AP_floor"] = df["AP_name"].str.split("-").str[2]  # 階数を抽出
 df["AP_building"] = df["AP_name"].str.split("-").str[1]  # 階数を抽出
 df["AP_segment"] = df["AP_floor"].astype(
@@ -36,9 +42,11 @@ df["AP_segment"] = df["AP_floor"].astype(
 df["AP_num"] = df["AP_name"].str.split("-").str[3]  # APの番号を抽出
 
 filtered_df = df[df["Counts (/100)"] >= 75]  # 条件：Countsが75以上のデータのみ抽出
-# 3F_Cのデータを抽出
+
+
+
 segment_C_df = filtered_df[filtered_df["Location index P"] <= 17]
-# 3F_Cのデータを抽出
+
 segment_C2_df = filtered_df[(filtered_df["Location index P"] >= 17) & (
     filtered_df["Location index P"] <= 45)]
 segment_C3_df = filtered_df[filtered_df["Location index P"] >= 45]
@@ -47,27 +55,51 @@ AP_list = df["AP_ID"].unique()  # AP_nameのユニークな値を表示
 # 階数、棟の名前で形を変える
 # 描画スタイルの設定
 print(filtered_df)
-fig, ax = plt.subplots(figsize=(12, 6))
-ax = sns.set(style="whitegrid")
 
-# グラフの描画
-ax = plot_df(ax, filtered_df,
+#3Fの全データ
+ax = plot_df( filtered_df[filtered_df["Location Floor"] == 3],
              "AVE (dBm) vs Location index P (Counts >= 75) on 3F")
-
 plt.savefig("fig/3F/all.png")
 plt.show()
 
-ax = plot_df(ax, segment_C_df,
+# 3FのC棟
+ax = plot_df( segment_C_df[segment_C_df["Location Floor"] == 3],
              "AVE (dBm) vs Location index P (Counts >= 75) on 3F at C")
 plt.savefig("fig/3F/C.png")
 plt.show()
 
-ax = plot_df(ax, segment_C2_df,
+# 3FのC2棟
+ax = plot_df( segment_C2_df[segment_C2_df["Location Floor"] == 3],
              "AVE (dBm) vs Location index P (Counts >= 75) on 3F at C2")
 plt.savefig("fig/3F/C2.png")
 plt.show()
 
-ax = plot_df(ax, segment_C3_df,
+# 3FのC3棟
+ax = plot_df( segment_C3_df[segment_C3_df["Location Floor"] == 3],
              "AVE (dBm) vs Location index P (Counts >= 75) on 3F at C3")
 plt.savefig("fig/3F/C3.png")
+plt.show()
+
+# 4Fの全データ
+ax = plot_df( filtered_df[filtered_df["Location Floor"] == 4],
+             "AVE (dBm) vs Location index P (Counts >= 75) on 4F")
+plt.savefig("fig/4F/all.png")
+plt.show()
+
+# 4FのC棟
+ax = plot_df( segment_C_df[segment_C_df["Location Floor"] == 4],
+             "AVE (dBm) vs Location index P (Counts >= 75) on 4F at C")
+plt.savefig("fig/4F/C.png")
+plt.show()
+
+# 4FのC2棟
+ax = plot_df( segment_C2_df[segment_C2_df["Location Floor"] == 4],
+             "AVE (dBm) vs Location index P (Counts >= 75) on 4F at C2")
+plt.savefig("fig/4F/C2.png")
+plt.show()
+
+# 4FのC3棟
+ax = plot_df( segment_C3_df[segment_C3_df["Location Floor"] == 4],
+             "AVE (dBm) vs Location index P (Counts >= 75) on 4F at C3")
+plt.savefig("fig/4F/C3.png")
 plt.show()
